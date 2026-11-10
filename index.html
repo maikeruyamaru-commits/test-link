@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>押してみて</title>
+<style>
+  html, body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    font-family: -apple-system, sans-serif;
+    background: #f0f4f8;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    touch-action: manipulation;
+  }
+  #stage {
+    position: relative;
+    width: 100vw;
+    height: 100dvh;
+  }
+  #btn {
+    position: absolute;
+    padding: 16px 32px;
+    font-size: 18px;
+    border: none;
+    border-radius: 12px;
+    background: #06c755;
+    color: #fff;
+    font-weight: bold;
+    cursor: pointer;
+    transition: top 0.15s ease, left 0.15s ease;
+    white-space: nowrap;
+  }
+  #msg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    text-align: center;
+    display: none;
+    line-height: 1.6;
+    width: 90%;
+  }
+  #count {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    font-size: 14px;
+    color: #888;
+  }
+</style>
+</head>
+<body>
+<div id="stage">
+  <div id="count">逃げた回数: 0 / 10</div>
+  <button id="btn">押してね</button>
+  <div id="msg">何やってんの(笑)<br><span style="font-size:14px;color:#888;">10回も逃げられてたよ</span></div>
+</div>
+
+<script>
+  const btn = document.getElementById('btn');
+  const stage = document.getElementById('stage');
+  const msg = document.getElementById('msg');
+  const countEl = document.getElementById('count');
+
+  let dodgeCount = 0;
+  const MAX_DODGE = 10;
+  let caught = false;
+
+  function moveButton() {
+    const pad = 20;
+    const maxX = stage.clientWidth - btn.offsetWidth - pad;
+    const maxY = stage.clientHeight - btn.offsetHeight - pad;
+    const x = Math.random() * Math.max(maxX, 0) + pad;
+    const y = Math.random() * Math.max(maxY, 0) + pad;
+    btn.style.left = x + 'px';
+    btn.style.top = y + 'px';
+  }
+
+  window.addEventListener('load', () => {
+    btn.style.left = (stage.clientWidth / 2 - btn.offsetWidth / 2) + 'px';
+    btn.style.top = (stage.clientHeight / 2 - btn.offsetHeight / 2) + 'px';
+  });
+
+  function dodge(e) {
+    if (caught) return;
+    e.preventDefault();
+    dodgeCount++;
+    countEl.textContent = `逃げた回数: ${dodgeCount} / ${MAX_DODGE}`;
+
+    if (dodgeCount >= MAX_DODGE) {
+      btn.style.background = '#ff6b6b';
+      btn.textContent = 'もう逃げないよ…押して';
+      return;
+    }
+    moveButton();
+  }
+
+  btn.addEventListener('touchstart', dodge, { passive: false });
+  btn.addEventListener('mousedown', dodge);
+
+  btn.addEventListener('click', (e) => {
+    if (dodgeCount < MAX_DODGE) {
+      dodge(e);
+      return;
+    }
+    caught = true;
+    btn.style.display = 'none';
+    countEl.style.display = 'none';
+    msg.style.display = 'block';
+  });
+</script>
+</body>
+</html>
